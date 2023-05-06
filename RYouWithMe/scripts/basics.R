@@ -46,3 +46,16 @@ names(beaches)
 cleanbeaches <- rename(cleanbeaches, beachbugs = enterococci_cfu_100ml)
 
 names(cleanbeaches)
+
+# select subset of columns
+select(cleanbeaches, council, site, beachbugs, everything())
+
+# pipe %>%
+
+cleanbeaches <- beaches %>%
+  clean_names() %>% 
+  rename(beachbugs = enterococci_cfu_100ml) %>% 
+  select(site, council, beachbugs)
+
+write_csv(cleanbeaches, "cleanbeaches.csv")
+
