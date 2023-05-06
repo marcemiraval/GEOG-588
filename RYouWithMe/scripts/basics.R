@@ -59,3 +59,15 @@ cleanbeaches <- beaches %>%
 
 write_csv(cleanbeaches, "cleanbeaches.csv")
 
+# exploring my own data ----
+
+tidydogs <- dogs %>% 
+  clean_names() %>%  # since the column names were already very good, it just changed a few (.) to (_) Careful with the autopredict in the next lines, because column names might change
+  rename(house_trained = attributes_house_trained,
+         spayed_neutered = attributes_spayed_neutered,
+         declawed = attributes_declawed,
+         spatial_needs = attributes_special_needs) %>% 
+  select(id, age, gender, type, species, name, breeds_primary, breeds_secondary, breeds_mixed, breeds_unknown, status, description, contact_address_address1)
+
+
+write_csv(dogs, "tidydogs.csv")
