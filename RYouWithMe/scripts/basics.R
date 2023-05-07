@@ -108,3 +108,23 @@ councilbysite <- cleanbeaches %>%
             medianbugs = median(beachbugs, na.rm =TRUE))
 
 
+# Asking questions about my own data -----
+
+# total number of dogs by breed
+countbybreed <- dogs %>% 
+  filter(species == "Dog") %>% 
+  group_by(breeds.primary, breeds.secondary) %>% 
+  count()
+
+# total number of dogs by breed
+countbybreedandgenger <- dogs %>% 
+  filter(species == "Dog") %>% 
+  group_by(breeds.primary, breeds.secondary) %>% 
+  count(gender)
+
+# total number of German Shepherd Dogs by primary-secondary breed, age, and gender
+gsd <- dogs %>% 
+  filter(species == "Dog", breeds.primary == "German Shepherd Dog" | breeds.secondary == "German Shepherd Dog") %>% 
+  group_by(breeds.primary, breeds.secondary, age, gender) %>% 
+  count()
+
