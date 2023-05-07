@@ -128,3 +128,42 @@ gsd <- dogs %>%
   group_by(breeds.primary, breeds.secondary, age, gender) %>% 
   count()
 
+
+# compute new variables ----
+
+glimpse(cleanbeaches) 
+
+testdate <- cleanbeaches %>% 
+  separate(date, into = c("day", "month", "year"), remove = FALSE)
+
+cleanbeaches %>% 
+  unite(council_site, council:site, remove = FALSE)
+
+# use mutate to transform the beachbugs data
+
+summary(cleanbeaches)
+
+cleanbeaches %>% 
+  mutate(logbeachbugs = log(beachbugs))
+
+# use mutate to compute numeric variable
+
+cleanbeaches %>% 
+  mutate(beachbugsdiff = beachbugs - lag(beachbugs))
+
+# use mutate to compute new logical variable
+
+cleanbeaches %>% 
+  mutate(buggier =  beachbugs > mean(beachbugs, na.rm = TRUE))
+
+meanbugs <- mean(cleanbeaches$beachbugs, na.rm = TRUE)
+
+cleanbeaches_new <- cleanbeaches %>% 
+  separate(date, c("day", "month","year"), remove = FALSE) %>% 
+  mutate(logbeachbugs = log(beachbugs)) %>% 
+  mutate(beachbugsdiff = beachbugs - lag(beachbugs)) %>% 
+  mutate(buggier_all = beachbugs > mean(beachbugs, na.rm = TRUE)) %>% 
+  group_by(site) %>% 
+  mutate(buggier_site = beachbugs > mean(beachbugs, na.rm = TRUE))
+
+
