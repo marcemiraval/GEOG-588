@@ -167,3 +167,25 @@ cleanbeaches_new <- cleanbeaches %>%
   mutate(buggier_site = beachbugs > mean(beachbugs, na.rm = TRUE))
 
 
+# compute new variables in my own dataset----
+
+# just checking how many records have a second address
+dogs_in_search %>% 
+  filter(!is.na(contact.address.address2)) %>% 
+  count()
+
+# piping to create a more readable dataset
+dogs_in_search <- dogs %>% 
+  unite(d_color, colors.primary:colors.secondary:colors.tertiary, sep = " / ") %>% 
+  filter(!is.na(contact.address.address1)) %>% 
+  select(-contact.address.address2) %>% 
+  unite(address, contact.address.address1:contact.address.city:contact.address.state, sep = " ,") %>% 
+  mutate(close_distance = distance < 50) %>% # This is unnecessary but just to demonstrate the function mutate
+  filter(close_distance == TRUE & type == "Dog") %>% 
+  group_by(breeds.primary, age, gender, size) %>% 
+  count() %>% 
+  rename(count = n, breed = breeds.primary) 
+
+# how many German Shepherds dogs and Shepherds are looking for a forever home?
+gsds <- dogs_in_search %>% 
+  filter(breed == "German Shepherd Dog" | breed == "Shepherd")
