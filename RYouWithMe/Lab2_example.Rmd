@@ -1,0 +1,88 @@
+---
+title: "Exploring PetFinder Data"
+author: "Marcela Suárez"
+# date: "2023-05-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load packages
+
+```{r load_data, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(here)
+library(skimr)
+library(janitor)
+```
+
+### Read data 
+
+In this report, I explore Petfinder data. Petfinder is an online database of animals who need homes. Using the [PetFinder API](https://www.petfinder.com/developers/v2/docs/#introduction) and R, I downloaded data available for the city of Los Angeles, CA by April 2023. 
+```{r read_data, message=FALSE, warning=FALSE, paged.print=FALSE}
+dogs <- read_csv(here("data","dogs_LA_data.csv.csv")) # dogs looking for forever homes in LA (via Petfinder.com)
+
+head(dogs)
+```
+
+### Tidy columns in the data
+
+```{r tidy_columns, message=FALSE, warning=TRUE, paged.print=TRUE}
+tidydogs <- dogs %>% 
+  clean_names() %>% # Careful with the autopredict in the next lines, because column names might change
+  rename(house_trained = attributes_house_trained,
+         spayed_neutered = attributes_spayed_neutered,
+         declawed = attributes_declawed,
+         spatial_needs = attributes_special_needs) %>% 
+  select(id, age, gender, type, species, name, breeds_primary, breeds_secondary, breeds_mixed, breeds_unknown, status, description, contact_address_address1)
+
+names(tidydogs) # list the new column names
+
+```
+Since the column names were already in good shape, it just changed a few (.) to (_).
+
+### Ask questions about the data
+
+How many german shepherd dogs are looking for forever home?
+
+```{r ask_questions, warning=FALSE}
+gsd <- dogs %>% 
+  filter(species == "Dog", breeds.primary == "German Shepherd Dog" | breeds.secondary == "German Shepherd Dog") %>% 
+  group_by(breeds.primary, breeds.secondary, age, gender) %>% 
+  count()
+
+gsd
+```
+
+### Compute new variables in the dataset
+
+Let's start by preparing a more readable dataset by piping and by using some data wrangling functions
+```{r prepare_better_dataset, message=FALSE, warning=FALSE, paged.print=TRUE}
+dogs_in_search <- dogs %>% 
+  unite(d_color, colors.primary:colors.secondary:colors.tertiary, sep = " / ") %>% 
+  filter(!is.na(contact.address.address1)) %>% 
+  select(-contact.address.address2) %>% 
+  unite(address, contact.address.address1:contact.address.city:contact.address.state, sep = " ,") %>% 
+  mutate(close_distance = distance < 50) %>% # This is unnecessary but just to demonstrate the function mutate
+  filter(close_distance == TRUE & type == "Dog") %>% 
+  group_by(breeds.primary, age, gender, size) %>% 
+  count() %>% 
+  rename(count = n, breed = breeds.primary) 
+
+summary(dogs_in_search)
+```
+
+Let's go back to the main question, how many LA's German Shepherds dogs and Shepherds are looking for a forever home?
+```{r create_gsds_dataset, message=FALSE, warning=FALSE, paged.print=TRUE}
+gsds <- dogs_in_search %>% 
+  filter(breed == "German Shepherd Dog" | breed == "Shepherd")
+
+gsds
+```
+
+**That's all for this week!**
+
+
+![](GSDS.jpg)
