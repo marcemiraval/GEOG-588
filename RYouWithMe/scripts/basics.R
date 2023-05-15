@@ -189,3 +189,8 @@ dogs_in_search <- dogs %>%
 # how many German Shepherds dogs and Shepherds are looking for a forever home?
 gsds <- dogs_in_search %>% 
   filter(breed == "German Shepherd Dog" | breed == "Shepherd")
+
+# write cleaned data to a .csv file -----
+
+write_csv(cleanbeaches_new, here("data","cleanbeaches_new.csv"))
+
